@@ -18,12 +18,14 @@ def get_DeaTHLesS_streams():
             continue
     
     if not active_domain:
+        print("No active domain found")
         return ""
     
     try:
         response = requests.get(active_domain, timeout=10)
         html = response.text
     except:
+        print("Main page not accessible")
         return ""
     
     first_id_match = re.search(r'<iframe[^>]+id="matchPlayer"[^>]+src="event\.html\?id=([^"]+)"', html)
@@ -40,12 +42,15 @@ def get_DeaTHLesS_streams():
             pass
     
     if not base_url:
+        print("Base URL not found")
         return ""
     
     channels = [
         ["beIN Sport 1 HD", "androstreamlivebs1", "https://i.hizliresim.com/8xzjgqv.jpg"],
         ["beIN Sport 2 HD", "androstreamlivebs2", "https://i.hizliresim.com/8xzjgqv.jpg"],
-        # ... tüm kanallar buraya
+        ["beIN Sport 3 HD", "androstreamlivebs3", "https://i.hizliresim.com/8xzjgqv.jpg"],
+        ["beIN Sport 4 HD", "androstreamlivebs4", "https://i.hizliresim.com/8xzjgqv.jpg"],
+        # ... diğer kanallarını ekle
     ]
     
     successful_channels = []
@@ -58,13 +63,16 @@ def get_DeaTHLesS_streams():
                 m3u_content += f'#EXTINF:-1 tvg-id="sport.tr" tvg-name="TR:{channel[0]}" tvg-logo="{channel[2]}" group-title="TURKIYE DEATHLESS",TR:{channel[0]}\n'
                 m3u_content += f"{stream_url}\n"
                 successful_channels.append(channel[0])
+                print(f"✅ {channel[0]}")
+            else:
+                print(f"❌ {channel[0]}")
         except:
-            continue
+            print(f"❌ {channel[0]}")
     
     m3u_header = f"""#EXTM3U
 # Generated: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 # Total Channels: {len(successful_channels)}
-# GitHub: https://github.com/hakantori47/andro-iptv
+# GitHub: https://github.com/hakantori47/andro
 
 """
     
@@ -77,11 +85,17 @@ def save_m3u_file(content):
     try:
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
+        print(f"💾 M3U file saved: {file_path}")
         return True
     except Exception as e:
+        print(f"❌ Error saving file: {e}")
         return False
 
 if __name__ == "__main__":
+    print("🚀 Starting DeaTHLesS GitHub Bot...")
     m3u_data = get_DeaTHLesS_streams()
     if m3u_data:
         save_m3u_file(m3u_data)
+        print("🎯 Process completed!")
+    else:
+        print("💥 No data to save!")
