@@ -1,10 +1,13 @@
 import requests
 import re
 import os
+import datetime
 
 def get_DeaTHLesS_streams():
+    print("🚀 Starting domain search...")
     m3u_content = ""
     
+    # Domain arama
     active_domain = None
     for i in range(42, 200):
         url = f"https://birazcikspor{i}.xyz/"
@@ -12,38 +15,57 @@ def get_DeaTHLesS_streams():
             response = requests.head(url, timeout=5)
             if response.status_code == 200:
                 active_domain = url
+                print(f"✅ Active domain found: {active_domain}")
                 break
-        except:
+            else:
+                print(f"❌ Domain {url} returned status: {response.status_code}")
+        except Exception as e:
+            print(f"❌ Domain {url} failed: {str(e)}")
             continue
     
     if not active_domain:
-        print("<!-- Birazcikspor: No active domain found -->")
+        print("💥 No active domain found in range 42-200")
         return ""
     
+    # Ana sayfayı al
     try:
+        print(f"📡 Fetching main page: {active_domain}")
         response = requests.get(active_domain, timeout=10)
         html = response.text
-    except:
-        print("<!-- Birazcikspor: Main page not accessible -->")
+        print("✅ Main page fetched successfully")
+    except Exception as e:
+        print(f"💥 Main page error: {str(e)}")
         return ""
     
+    # İframe ID'sini bul
     first_id_match = re.search(r'<iframe[^>]+id="matchPlayer"[^>]+src="event\.html\?id=([^"]+)"', html)
-    first_id = first_id_match.group(1) if first_id_match else None
-    
-    base_url = ""
-    if first_id:
-        try:
-            event_response = requests.get(f"{active_domain}event.html?id={first_id}", timeout=10)
-            event_source = event_response.text
-            base_url_match = re.search(r'var\s+baseurls\s*=\s*\[\s*"([^"]+)"', event_source)
-            base_url = base_url_match.group(1) if base_url_match else ""
-        except:
-            pass
-    
-    if not base_url:
-        print("<!-- Birazcikspor: Base URL not found -->")
+    if first_id_match:
+        first_id = first_id_match.group(1)
+        print(f"🎯 Found iframe ID: {first_id}")
+    else:
+        print("💥 No iframe ID found")
         return ""
     
+    # Base URL'yi al
+    base_url = ""
+    try:
+        event_url = f"{active_domain}event.html?id={first_id}"
+        print(f"🔍 Fetching event page: {event_url}")
+        event_response = requests.get(event_url, timeout=10)
+        event_source = event_response.text
+        
+        base_url_match = re.search(r'var\s+baseurls\s*=\s*\[\s*"([^"]+)"', event_source)
+        if base_url_match:
+            base_url = base_url_match.group(1)
+            print(f"🌐 Base URL found: {base_url}")
+        else:
+            print("💥 Base URL not found in event page")
+            return ""
+    except Exception as e:
+        print(f"💥 Event page error: {str(e)}")
+        return ""
+    
+    # Kanal listesi
     channels = [
         ["beIN Sport 1 HD", "androstreamlivebs1", "https://i.hizliresim.com/8xzjgqv.jpg"],
         ["beIN Sport 2 HD", "androstreamlivebs2", "https://i.hizliresim.com/8xzjgqv.jpg"],
@@ -83,6 +105,7 @@ def get_DeaTHLesS_streams():
         ["Exxen 8 HD", "androstreamliveexn8", "https://i.hizliresim.com/8xzjgqv.jpg"],
     ]
     
+    print(f"🔍 Checking {len(channels)} channels...")
     successful_channels = []
     
     for channel in channels:
@@ -95,6 +118,44 @@ def get_DeaTHLesS_streams():
                 successful_channels.append(channel[0])
                 print(f"✅ {channel[0]}")
             else:
-                print(f"❌ {channel[0]}")
-        except:
-            print(f"❌ {channel[0]}")
+                print(f"❌ {channel[0]} - Status: {response.status_code}")
+        except Exception as e:
+            print(f"❌ {channel[0]} - Error: {str(e)}")
+    
+    print(f"\n📊 RESULT: {len(successful_channels)}/{len(channels)} channels working")
+    
+    if not successful_channels:
+        print("💥 No working channels found!")
+        return ""
+    
+    # M3U header
+    m3u_header = f"""#EXTM3U
+# Generated: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+# Total Channels: {len(successful_channels)}
+# GitHub: https://github.com/hakantori47/andro
+
+"""
+    
+    return m3u_header + m3u_content
+
+def save_m3u_file(content):
+    os.makedirs("docs", exist_ok=True)
+    file_path = "docs/DeaTHlesS-Androiptv.m3u"
+    
+    try:
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"💾 M3U file saved: {file_path}")
+        return True
+    except Exception as e:
+        print(f"❌ Error saving file: {e}")
+        return False
+
+if __name__ == "__main__":
+    print("🚀 Starting DeaTHLesS GitHub Bot...")
+    m3u_data = get_DeaTHLesS_streams()
+    if m3u_data:
+        save_m3u_file(m3u_data)
+        print("🎯 Process completed successfully!")
+    else:
+        print("💥 Process failed - no M3U data generated")
