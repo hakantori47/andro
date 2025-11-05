@@ -27,7 +27,7 @@ jobs:
         pip install requests urllib3
         
     - name: Run M3U Generator
-      run: python "andro.py"
+      run: python "andro bot.by"
       
     - name: Commit and push
       run: |
