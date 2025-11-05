@@ -1,8 +1,37 @@
-- name: Commit and push changes
-  run: |
-    git config --local user.email "action@github.com"
-    git config --local user.name "GitHub Action"
-    git add DeaTHlesS-Androiptv.m3u  # SADECE M3U DOSYASINI EKLE
-    git commit -m "Auto-update M3U playlist - $(date)" || echo "No changes to commit"
-    git pull origin main --rebase
-    git push
+name: Update M3U Playlist
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install requests
+      run: pip install requests
+
+    - name: Generate M3U
+      run: python andro_bot.py
+
+    - name: Commit M3U file
+      run: |
+        git config user.name "GitHub Action"
+        git config user.email "action@github.com"
+        git add DeaTHlesS-Androiptv.m3u
+        git commit -m "Update M3U playlist" || exit 0
+        git push
