@@ -2,8 +2,8 @@ name: Update M3U Playlist
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Her 10 dakikada bir
-  workflow_dispatch:  # Manuel çalıştırma
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
   push:
     branches: [ main ]
 
@@ -13,7 +13,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
@@ -31,9 +31,9 @@ jobs:
       run: |
         python andro_bot.py
         
-    - name: Commit and push if changed
+    - name: Commit and push changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add -A
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update M3U playlist" && git push)
+        git add docs/
+        git diff --cached --quiet || (git commit -m "Auto-update M3U playlist" && git push)
