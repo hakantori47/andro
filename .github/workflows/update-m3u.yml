@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-DeaTHlesS-Androiptv.m3u
+  update-atom-m3u:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,13 +31,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Run Atom Generator
-        run: python andro_bot.py
+      - name: Run M3U Generator
+        run: python andro_bot.py  # Resimdeki dosya adı bu
 
       - name: Commit Changes
         run: |
-          git add atom.m3u
-          git commit -m "Auto-update DeaTHlesS-Androiptv.m3u" || echo "No changes to commit"
+          git add DeaTHIesS-Androiptv.m3u  # Resimdeki M3U dosyası bu
+          git commit -m "Auto-update M3U file" || echo "No changes to commit"
 
       - name: Pull Latest Changes
         run: |
