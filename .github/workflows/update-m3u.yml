@@ -1,4 +1,4 @@
-name: Update M3U Playlist
+name: andro bot
 
 on:
   schedule:
@@ -27,7 +27,7 @@ jobs:
         pip install requests urllib3
         
     - name: Run M3U Generator
-      run: python "Deathless Selçuk spor otomatik bulucu.py"
+      run: python "andro_bot.py"
       
     - name: Commit and push
       run: |
