@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-atom-m3u:
+  update-DeaTHlesS-Androiptv.m3u
     runs-on: ubuntu-latest
 
     steps:
