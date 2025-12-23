@@ -32,11 +32,14 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run M3U Generator
-        run: python andro_bot.py  # Resimdeki dosya adı bu
+        run: python andro_bot.py
+
+      - name: Check if M3U file exists
+        run: ls -la *.m3u || echo "No M3U files found"
 
       - name: Commit Changes
         run: |
-          git add DeaTHIesS-Androiptv.m3u  # Resimdeki M3U dosyası bu
+          git add DeaTHIesS-Androiptv.m3u  # DÜZELTİLDİ: Doğru dosya adı
           git commit -m "Auto-update M3U file" || echo "No changes to commit"
 
       - name: Pull Latest Changes
