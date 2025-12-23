@@ -37,7 +37,7 @@ jobs:
       - name: Commit Changes
         run: |
           git add atom.m3u
-          git commit -m "Auto-update atom.m3u" || echo "No changes to commit"
+          git commit -m "Auto-update DeaTHlesS-Androiptv.m3u" || echo "No changes to commit"
 
       - name: Pull Latest Changes
         run: |
